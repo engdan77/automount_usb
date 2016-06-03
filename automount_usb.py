@@ -18,6 +18,7 @@ def get_devs_by_mount(input, prefixes=['/dev/mm.', '/dev/mapper']):
 
 def get_connected_devs(_dir='/dev', prefixes=['/dev/mm.', '/dev/mapper']):
     """Return connected partitions"""
+    prefixes = prefixes.split(',')
     devs = os.listdir(_dir)
     result = list()
     for dev in devs:
@@ -27,13 +28,13 @@ def get_connected_devs(_dir='/dev', prefixes=['/dev/mm.', '/dev/mapper']):
     return result
 
 
-def mount_device(dev, mountroot='/dev/mnt'):
+def mount_device(dev, mountroot='/mnt'):
     """Mount device"""
-    dev = dev.split('/')[-1]
-    dev_dir = '{}/{}'.format(mountroot, dev)
+    dev_dir = '{}/{}'.format(mountroot, dev.split('/')[-1])
     if not os.path.isdir(dev_dir):
         os.mkdir(dev_dir)
-    check_output('mount {} {}'.format(dev, dev_dir))
+    print 'Mounting {} to {}'.format(dev, dev_dir)
+    check_output('mount {} {}'.format(dev, dev_dir), shell=True)
 
 
 if __name__ == '__main__':
@@ -48,5 +49,4 @@ if __name__ == '__main__':
 
     for connected_dev in connected_devs:
         if not connected_dev in mounted_devs:
-            print 'Mounting {}'.format(connected_dev)
-            mount_device(connected_dev)
+            mount_device(connected_dev, mountroot=args.mount_root)
